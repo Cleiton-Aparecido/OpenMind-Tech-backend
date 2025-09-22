@@ -6,7 +6,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Url } from './url.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -30,7 +29,4 @@ export class User {
 
   @Column({ nullable: true })
   deletedAt: Date;
-
-  @OneToMany(() => Url, (url) => url.user)
-  urls: Url[];
 }
