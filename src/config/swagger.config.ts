@@ -4,7 +4,7 @@ import { SwaggerTheme, SwaggerThemeNameEnum } from 'swagger-themes';
 
 export function setupSwagger(app: INestApplication): void {
   const config = new DocumentBuilder()
-    .setTitle('link shortener API')
+    .setTitle('documentation API')
     .setDescription('Documentação da API para encurtar URLs')
     .setVersion('1.0')
     .addBearerAuth(
