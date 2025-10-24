@@ -2,28 +2,39 @@ import {
   Entity,
   Column,
   PrimaryColumn,
-  OneToMany,
+  ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
-  DeleteDateColumn,
   Index,
+  JoinColumn,
 } from 'typeorm';
-import { Feed } from './feed.entity';
+import { User } from './user.entity';
 
-@Entity({ name: 'users' })
-@Index('UQ_users_email', ['email'], { unique: true })
-export class User {
+@Entity({ name: 'feed' })
+export class Feed {
   @PrimaryColumn('char', { length: 36, default: () => 'UUID()' })
   id: string;
 
   @Column('varchar', { length: 255 })
-  name: string;
+  title: string;
 
-  @Column('varchar', { length: 255 })
-  email: string;
+  @Column('text')
+  content: string;
 
-  @Column('varchar', { length: 255 })
-  password: string;
+  @Index('IDX_feed_userId')
+  @Column('char', { length: 36, name: 'userId' })
+  userId: string;
+
+  @ManyToOne(() => User, (user) => User.feeds, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({
+    name: 'userId',
+    referencedColumnName: 'id',
+    foreignKeyConstraintName: 'FK_feed_userId__users_id',
+  })
+  user: User;
 
   @CreateDateColumn({
     type: 'timestamp',
@@ -39,10 +50,4 @@ export class User {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
-
-  @DeleteDateColumn({ type: 'timestamp', name: 'deletedAt', nullable: true })
-  deletedAt: Date | null;
-
-  @OneToMany(() => Feed, (feed) => feed.user)
-  feeds: Feed[];
 }
