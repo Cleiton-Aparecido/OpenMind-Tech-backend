@@ -7,13 +7,14 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   Index,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Feed } from './feed.entity';
 
 @Entity({ name: 'users' })
 @Index('UQ_users_email', ['email'], { unique: true })
 export class User {
-  @PrimaryColumn('char', { length: 36, default: () => 'UUID()' })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column('varchar', { length: 255 })

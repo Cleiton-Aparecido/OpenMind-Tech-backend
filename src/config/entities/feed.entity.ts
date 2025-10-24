@@ -25,7 +25,7 @@ export class Feed {
   @Column('char', { length: 36, name: 'userId' })
   userId: string;
 
-  @ManyToOne(() => User, (user) => User.feeds, {
+  @ManyToOne(() => User, (user) => user.feeds, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
