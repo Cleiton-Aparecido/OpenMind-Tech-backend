@@ -40,7 +40,13 @@ export class FeedService implements FeedUseCase {
     limit = 20,
   ): Promise<{ data: Feed[]; total: number; page: number; limit: number }> {
     if ('findAllByUserPaged' in this.feedRepository) {
-      return this.feedRepository.findAllByUserPaged!(userId, page, limit);
+      const feed = await this.feedRepository.findAllByUserPaged!(
+        userId,
+        page,
+        limit,
+      );
+
+      return feed;
     }
 
     const data = await this.feedRepository.findAllByUser(userId);
