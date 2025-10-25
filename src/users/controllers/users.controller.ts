@@ -2,12 +2,14 @@ import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Public()
   @Post()
   @ApiOperation({
     summary: 'cadastrar usuários',
@@ -42,6 +44,7 @@ export class UsersController {
   })
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() data: CreateUserDto) {
+    console.log(data);
     return this.usersService.create(data);
   }
 }
