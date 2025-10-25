@@ -10,6 +10,7 @@ export class NewMigration1761335631254 implements MigrationInterface {
         userId CHAR(36) NOT NULL,
         createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        deletedAt TIMESTAMP NULL,
         CONSTRAINT PK_feed PRIMARY KEY (id),
         INDEX IDX_feed_userId (userId),
         CONSTRAINT FK_feed_userId__users_id

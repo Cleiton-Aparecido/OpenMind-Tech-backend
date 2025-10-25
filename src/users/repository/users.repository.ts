@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DeepPartial, FindOptionsWhere, IsNull, Repository } from 'typeorm';
+
 import { User } from '../../config/entities/user.entity';
-import { Repository, FindOptionsWhere, IsNull, DeepPartial } from 'typeorm';
 
 @Injectable()
 export class UsersRepository {
@@ -10,24 +11,24 @@ export class UsersRepository {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  /**
-   * Converte Partial<User> em FindOptionsWhere<User>,
-   * tratando deletedAt === null como IsNull()
-   */
   private buildWhere(partial: Partial<User>): FindOptionsWhere<User> {
-    const { deletedAt, ...rest } = partial;
+    const { feeds, deletedAt, ...rest } = partial as any;
 
-    const where: FindOptionsWhere<User> = { ...rest };
+    const where: any = {};
+    Object.entries(rest).forEach(([key, value]) => {
+      if (value === undefined || value === null || typeof value === 'object') {
+        return;
+      }
+      where[key] = value;
+    });
 
     if (deletedAt === null) {
-      // traduz "quero onde deletedAt é NULL"
-      (where as any).deletedAt = IsNull();
+      where.deletedAt = IsNull();
     } else if (deletedAt instanceof Date) {
-      (where as any).deletedAt = deletedAt;
+      where.deletedAt = deletedAt;
     }
-    // se for undefined, simplesmente não filtra por deletedAt
 
-    return where;
+    return where as FindOptionsWhere<User>;
   }
 
   async findOne(partial: Partial<User>) {
@@ -40,11 +41,10 @@ export class UsersRepository {
   }
 
   create(data: DeepPartial<User>): User {
-    console.log(data);
     return this.userRepository.create(data);
   }
 
-  // Helpers úteis (opcionais)
+  // Helpers
   async findActiveById(id: string) {
     return this.userRepository.findOne({
       where: { id, deletedAt: IsNull() },

@@ -1,18 +1,20 @@
 import {
-  Entity,
   Column,
-  PrimaryColumn,
-  ManyToOne,
   CreateDateColumn,
-  UpdateDateColumn,
+  DeleteDateColumn,
+  Entity,
   Index,
   JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+
 import { User } from './user.entity';
 
 @Entity({ name: 'feed' })
 export class Feed {
-  @PrimaryColumn('char', { length: 36, default: () => 'UUID()' })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column('varchar', { length: 255 })
@@ -50,4 +52,7 @@ export class Feed {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', name: 'deletedAt', nullable: true })
+  deletedAt: Date | null;
 }

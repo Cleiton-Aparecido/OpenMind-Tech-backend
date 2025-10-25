@@ -10,7 +10,7 @@ import { FeedModule } from './feed/feed.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Variáveis de ambiente disponíveis em toda a app
+      isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
