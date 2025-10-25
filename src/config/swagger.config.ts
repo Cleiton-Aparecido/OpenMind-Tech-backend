@@ -5,7 +5,7 @@ import { SwaggerTheme, SwaggerThemeNameEnum } from 'swagger-themes';
 export function setupSwagger(app: INestApplication): void {
   const config = new DocumentBuilder()
     .setTitle('documentation API')
-    .setDescription('Documentação da API para encurtar URLs')
+    .setDescription('Documentação da API para do open mind tech')
     .setVersion('1.0')
     .addBearerAuth(
       {
@@ -28,6 +28,6 @@ export function setupSwagger(app: INestApplication): void {
       persistAuthorization: true,
     },
     customCss: darkStyle,
-    customSiteTitle: 'API Docs - Url Shortener',
+    customSiteTitle: 'API Docs - OpenMind-Tech',
   });
 }
