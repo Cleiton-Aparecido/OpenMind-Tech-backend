@@ -138,6 +138,17 @@ export class FeedController {
       },
     },
   })
+  @ApiResponse({
+    status: 404,
+    description: 'Post criado com sucesso',
+    schema: {
+      example: {
+        message: 'Feed not found',
+        error: 'Not Found',
+        statusCode: 404,
+      },
+    },
+  })
   async delete(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Req() req: AuthRequest,

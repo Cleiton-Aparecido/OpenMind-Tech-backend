@@ -37,7 +37,7 @@ export class FeedRepository implements IFeedRepository {
     limit = 20,
   ): Promise<{ data: Feed[]; total: number; page: number; limit: number }> {
     const [data, total] = await this.feedRepository.findAndCount({
-      where: { userId },
+      // where: { userId },
       order: { createdAt: 'DESC' as const },
       skip: (page - 1) * limit,
       take: limit,
@@ -57,7 +57,9 @@ export class FeedRepository implements IFeedRepository {
 
   /** DELETE (retorna se excluiu) */
   async deleteById(id: string): Promise<boolean> {
-    const res: DeleteResult = await this.feedRepository.delete(id);
+    // const res: DeleteResult = await this.feedRepository.delete(id);
+    const patch = { deletedAt: new Date() };
+    const res: UpdateResult = await this.feedRepository.update({ id }, patch);
     return (res.affected ?? 0) > 0;
   }
 }

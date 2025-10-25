@@ -39,12 +39,10 @@ export class FeedService implements FeedUseCase {
     page = 1,
     limit = 20,
   ): Promise<{ data: Feed[]; total: number; page: number; limit: number }> {
-    // usa paginação se disponível no repo
     if ('findAllByUserPaged' in this.feedRepository) {
       return this.feedRepository.findAllByUserPaged!(userId, page, limit);
     }
 
-    // fallback para lista simples
     const data = await this.feedRepository.findAllByUser(userId);
     return { data, total: data.length, page, limit };
   }
@@ -69,7 +67,6 @@ export class FeedService implements FeedUseCase {
     if (feed.userId !== userId)
       throw new ForbiddenException('You are not allowed to edit this feed');
 
-    // Se o repo tiver updateById, usa direto (mais rápido)
     if ('updateById' in this.feedRepository) {
       await this.feedRepository.updateById!(id, dto);
     } else {
