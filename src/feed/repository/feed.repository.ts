@@ -35,13 +35,24 @@ export class FeedRepository implements IFeedRepository {
     userId: string,
     page = 1,
     limit = 20,
-  ): Promise<{ data: Feed[]; total: number; page: number; limit: number }> {
-    const [data, total] = await this.feedRepository.findAndCount({
-      // where: { userId },
-      order: { createdAt: 'DESC' as const },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+  ): Promise<{ data: any; total: number; page: number; limit: number }> {
+    const [feeds, total] = await this.feedRepository
+      .createQueryBuilder('feed')
+      .innerJoinAndSelect('feed.user', 'user')
+      // .where('feed.userId = :userId', { userId })
+      .orderBy('feed.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    const data = feeds.map((f) => ({
+      id: f.id,
+      title: f.title,
+      content: f.content,
+      createdAt: f.createdAt,
+      userId: f.userId,
+      userName: f.user?.name,
+    }));
 
     return { data, total, page, limit };
   }
