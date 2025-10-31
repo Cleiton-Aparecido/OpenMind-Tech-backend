@@ -56,7 +56,6 @@ export class FeedController {
     return this.feedUseService.createPost(dto, userId);
   }
 
-  /** READ - lista todos do usuário autenticado */
   @Get()
   @ApiOkResponse({
     description: 'Lista os posts do usuário autenticado (paginado)',
@@ -67,9 +66,11 @@ export class FeedController {
             id: '94619e73-843d-4313-9aa2-698b12a6af2c',
             title: 'Estudo sobre NestJS',
             content: 'Conteúdo do post...',
+            imageUrl: 'https://example.com/image.jpg',
+            images: ['https://example.com/img1.jpg', 'https://example.com/img2.jpg'],
             userId: '0ecf3512-b45f-4443-85b9-80142ff278a6',
+            userName: 'João Silva',
             createdAt: '2025-10-25T12:00:00.000Z',
-            updatedAt: '2025-10-25T12:00:00.000Z',
           },
         ],
         total: 1,
