@@ -24,6 +24,8 @@ export class FeedService implements FeedUseCase {
         content: dto.content,
         title: dto.title,
         userId,
+        imageUrl: dto.imageUrl,
+        images: dto.images,
       });
 
       return { message: 'Post created successfully', feedId: feedData.id };
@@ -33,7 +35,6 @@ export class FeedService implements FeedUseCase {
     }
   }
 
-  /** READ - listar todos do usuário (paginado ou simples) */
   async listMyFeed(
     userId: string,
     page = 1,
@@ -53,7 +54,6 @@ export class FeedService implements FeedUseCase {
     return { data, total: data.length, page, limit };
   }
 
-  /** READ - buscar um feed específico */
   async getMyPost(id: string, userId: string): Promise<Feed> {
     const feed = await this.feedRepository.findById(id);
     if (!feed) throw new NotFoundException('Feed not found');
@@ -62,7 +62,6 @@ export class FeedService implements FeedUseCase {
     return feed;
   }
 
-  /** UPDATE */
   async updateMyPost(
     id: string,
     dto: FeedUpdateDto,
@@ -83,7 +82,6 @@ export class FeedService implements FeedUseCase {
     return { message: 'Post updated successfully', feedId: id };
   }
 
-  /** DELETE */
   async deleteMyPost(id: string, userId: string): Promise<FeedResponseDto> {
     const feed = await this.feedRepository.findById(id);
     if (!feed) throw new NotFoundException('Feed not found');

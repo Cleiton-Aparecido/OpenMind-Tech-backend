@@ -23,6 +23,12 @@ export class Feed {
   @Column('text')
   content: string;
 
+  @Column('varchar', { length: 500, nullable: true, name: 'imageUrl' })
+  imageUrl?: string;
+
+  @Column('json', { nullable: true })
+  images?: string[];
+
   @Index('IDX_feed_userId')
   @Column('char', { length: 36, name: 'userId' })
   userId: string;

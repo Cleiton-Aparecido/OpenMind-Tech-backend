@@ -13,7 +13,7 @@ export abstract class IFeedRepository {
   ): Promise<{ data: Feed[]; total: number; page: number; limit: number }>;
   abstract updateById?(
     id: string,
-    patch: Partial<Pick<Feed, 'title' | 'content'>>,
+    patch: Partial<Pick<Feed, 'title' | 'content' | 'imageUrl' | 'images'>>,
   ): Promise<boolean>;
   abstract deleteById(id: string): Promise<boolean>;
 }
