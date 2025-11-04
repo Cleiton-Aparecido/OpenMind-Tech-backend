@@ -1,27 +1,150 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableForeignKey,
+} from 'typeorm';
 
 export class NewMigration1761335631254 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `CREATE TABLE feed (
-        id CHAR(36) NOT NULL DEFAULT (UUID()),
-        title VARCHAR(255) NOT NULL,
-        content TEXT NOT NULL,
-        userId CHAR(36) NOT NULL,
-        createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        deletedAt TIMESTAMP NULL,
-        CONSTRAINT PK_feed PRIMARY KEY (id),
-        INDEX IDX_feed_userId (userId),
-        CONSTRAINT FK_feed_userId__users_id
-          FOREIGN KEY (userId) REFERENCES users(id)
-          ON DELETE CASCADE
-          ON UPDATE CASCADE
-      )`,
+    const dbType = queryRunner.connection.options.type;
+
+    // Criação da tabela principal
+    await queryRunner.createTable(
+      new Table({
+        name: 'feed',
+        columns: [
+          {
+            name: 'id',
+            type: this.resolveIdType(dbType),
+            isPrimary: true,
+            isNullable: false,
+            generationStrategy: this.resolveGenerationStrategy(dbType),
+            default: this.resolveIdDefault(dbType),
+          },
+          {
+            name: 'title',
+            type: 'varchar',
+            length: '255',
+            isNullable: false,
+          },
+          {
+            name: 'content',
+            type: dbType === 'mssql' ? 'nvarchar(max)' : 'text',
+            isNullable: false,
+          },
+          {
+            name: 'userId',
+            type: this.resolveIdType(dbType),
+            isNullable: false,
+          },
+          {
+            name: 'createdAt',
+            type: this.resolveDateType(dbType),
+            default: this.resolveDateDefault(dbType),
+            isNullable: false,
+          },
+          {
+            name: 'updatedAt',
+            type: this.resolveDateType(dbType),
+            default: this.resolveDateDefault(dbType),
+            isNullable: false,
+          },
+          {
+            name: 'deletedAt',
+            type: this.resolveDateType(dbType),
+            isNullable: true,
+          },
+        ],
+        indices: [
+          {
+            name: 'IDX_feed_userId',
+            columnNames: ['userId'],
+          },
+        ],
+      }),
+      true,
+    );
+
+    // Criação da chave estrangeira
+    await queryRunner.createForeignKey(
+      'feed',
+      new TableForeignKey({
+        name: 'FK_feed_userId__users_id',
+        columnNames: ['userId'],
+        referencedTableName: 'users',
+        referencedColumnNames: ['id'],
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP TABLE feed`);
+    // Remove a FK primeiro (boa prática)
+    const table = await queryRunner.getTable('feed');
+    const foreignKey = table?.foreignKeys.find(
+      (fk) => fk.name === 'FK_feed_userId__users_id',
+    );
+    if (foreignKey) {
+      await queryRunner.dropForeignKey('feed', foreignKey);
+    }
+
+    await queryRunner.dropTable('feed');
+  }
+
+  // === Helpers para compatibilidade multi-banco ===
+
+  private resolveIdType(db: string): string {
+    switch (db) {
+      case 'postgres':
+        return 'uuid';
+      case 'mssql':
+        return 'uniqueidentifier';
+      case 'sqlite':
+        return 'text';
+      default:
+        return 'char';
+    }
+  }
+
+  private resolveGenerationStrategy(db: string): 'uuid' | undefined {
+    return db === 'postgres' ? 'uuid' : undefined;
+  }
+
+  private resolveIdDefault(db: string): string | undefined {
+    switch (db) {
+      case 'postgres':
+        return 'gen_random_uuid()';
+      case 'mysql':
+      case 'mariadb':
+        return '(UUID())';
+      case 'mssql':
+        return 'NEWID()';
+      case 'sqlite':
+        return '(lower(hex(randomblob(16))))';
+      default:
+        return undefined;
+    }
+  }
+
+  private resolveDateType(db: string): string {
+    return db === 'mssql' ? 'datetime' : 'timestamp';
+  }
+
+  private resolveDateDefault(db: string): string {
+    switch (db) {
+      case 'postgres':
+        return 'now()';
+      case 'mysql':
+      case 'mariadb':
+        return 'CURRENT_TIMESTAMP';
+      case 'sqlite':
+        return "(datetime('now'))";
+      case 'mssql':
+        return 'GETDATE()';
+      default:
+        return 'CURRENT_TIMESTAMP';
+    }
   }
 }
