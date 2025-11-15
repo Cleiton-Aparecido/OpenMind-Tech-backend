@@ -20,7 +20,7 @@ export class UsersService implements UsersUseCase {
     createUserDto: CreateUserDto,
   ): Promise<{ statusCode: number; message: string }> {
     try {
-      const { email, name, password } = createUserDto;
+      const { email, name, password, role } = createUserDto;
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -33,6 +33,7 @@ export class UsersService implements UsersUseCase {
         email,
         name,
         password: hashedPassword,
+        role,
       });
       await this.usersRepository.save(userCreated);
 
