@@ -10,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Feed } from './feed.entity';
+import { UserRole } from '../../users/enums/user-role.enum';
 
 @Entity({ name: 'users' })
 @Index('UQ_users_email', ['email'], { unique: true })
@@ -25,6 +26,9 @@ export class User {
 
   @Column('varchar', { length: 255 })
   password: string;
+
+  @Column('varchar', { length: 100, nullable: true })
+  role?: string;
 
   @CreateDateColumn({
     type: 'timestamp',

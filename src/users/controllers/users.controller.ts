@@ -34,12 +34,21 @@ export class UsersController {
     description: 'Cadastrar novo usuário, e email não deve ser duplicado',
     type: CreateUserDto,
     examples: {
-      exemplo: {
-        summary: 'exemplo de dados para cadastro de usuário',
+      exemplo1: {
+        summary: 'Cadastro sem cargo',
         value: {
           email: 'user@email.com',
           name: 'user',
           password: '123456',
+        },
+      },
+      exemplo2: {
+        summary: 'Cadastro com cargo de TI',
+        value: {
+          email: 'dev@email.com',
+          name: 'João Silva',
+          password: '123456',
+          role: 'Desenvolvedor Júnior',
         },
       },
     },
@@ -73,6 +82,7 @@ export class UsersController {
         id: '73f45c85-744b-41db-a570-19c2097631d5',
         name: 'user',
         email: 'cleiton@email.com',
+        role: 'Desenvolvedor Pleno',
         createdAt: '2025-10-25T16:30:16.000Z',
         updatedAt: '2025-10-25T16:30:16.000Z',
       },
