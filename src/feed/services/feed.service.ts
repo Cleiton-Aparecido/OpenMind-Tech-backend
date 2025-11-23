@@ -9,6 +9,7 @@ import { FeedUseCase } from './feed.usecase';
 import { FeedResponseDto } from '../dto/feed-response.dto';
 import { FeedUpdateDto } from '../dto/feed-update.dto';
 import { Feed } from 'src/config/entities/feed.entity';
+import { FeedGetDto } from '../dto/feed-get.dto';
 
 @Injectable()
 export class FeedService implements FeedUseCase {
@@ -23,7 +24,7 @@ export class FeedService implements FeedUseCase {
       const feedData = await this.feedRepository.save({
         content: dto.content,
         title: dto.title,
-        userId,
+        userId: userId,
         imageUrl: dto.imageUrl,
         images: dto.images,
       });
@@ -39,14 +40,18 @@ export class FeedService implements FeedUseCase {
     userId: string,
     page = 1,
     limit = 20,
-  ): Promise<{ data: Feed[]; total: number; page: number; limit: number }> {
+  ): Promise<{
+    data: FeedGetDto[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
     if ('findAllByUserPaged' in this.feedRepository) {
       const feed = await this.feedRepository.findAllByUserPaged!(
         userId,
         page,
         limit,
       );
-
       return feed;
     }
 
