@@ -35,7 +35,6 @@ export class FeedRepository implements IFeedRepository {
     const [feeds, total] = await this.feedRepository
       .createQueryBuilder('feed')
       .innerJoinAndSelect('feed.user', 'user')
-      // .where('feed.userId = :userId', { userId })
       .orderBy('feed.createdAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit)
@@ -50,6 +49,7 @@ export class FeedRepository implements IFeedRepository {
       createdAt: f.createdAt,
       userId: f.userId,
       userName: f.user?.name,
+      edit: userId == f.userId,
     }));
 
     return { data, total, page, limit };

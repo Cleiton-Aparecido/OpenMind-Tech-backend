@@ -3,11 +3,9 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  RelationId,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -30,20 +28,9 @@ export class Feed {
   @Column('json', { nullable: true })
   images?: string[];
 
-  // @Index('IDX_feed_userId')
-  // @Column('char', { length: 36, name: 'userId' })
-  // userId: string;
+  @Column()
+  userId: string;
 
-  // @ManyToOne(() => User, (user) => user.feeds, {
-  //   onDelete: 'CASCADE',
-  //   onUpdate: 'CASCADE',
-  // })
-  // @JoinColumn({
-  //   name: 'userId',
-  //   referencedColumnName: 'id',
-  //   foreignKeyConstraintName: 'FK_feed_userId__users_id',
-  // })
-  // user: User;
   @ManyToOne(() => User, (user) => user.feeds, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
@@ -54,9 +41,6 @@ export class Feed {
     foreignKeyConstraintName: 'FK_feed_userId__users_id',
   })
   user: User;
-
-  @RelationId((feed: Feed) => feed.user)
-  userId: string; // 👈 aqui volta a existir pra TS, mas não é @Column
 
   @CreateDateColumn({
     type: 'timestamp',

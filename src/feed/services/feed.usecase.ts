@@ -2,6 +2,7 @@ import { FeedCreateDto } from '../dto/feed-create.dto';
 import { FeedUpdateDto } from '../dto/feed-update.dto';
 import { FeedResponseDto } from '../dto/feed-response.dto';
 import { Feed } from 'src/config/entities/feed.entity';
+import { FeedGetDto } from '../dto/feed-get.dto';
 
 export abstract class FeedUseCase {
   /**
@@ -24,7 +25,12 @@ export abstract class FeedUseCase {
     userId: string,
     page?: number,
     limit?: number,
-  ): Promise<{ data: Feed[]; total: number; page: number; limit: number }>;
+  ): Promise<{
+    data: FeedGetDto[];
+    total: number;
+    page: number;
+    limit: number;
+  }>;
 
   /**
    * Busca um post específico do usuário autenticado.
