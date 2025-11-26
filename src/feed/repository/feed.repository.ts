@@ -50,6 +50,7 @@ export class FeedRepository implements IFeedRepository {
       createdAt: f.createdAt,
       userId: f.userId,
       userName: f.user?.name,
+      edit: f.userId === userId, 
     }));
 
     return { data, total, page, limit };
