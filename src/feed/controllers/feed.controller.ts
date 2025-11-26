@@ -40,7 +40,7 @@ export class FeedController {
     description: 'Post criado com sucesso',
     schema: {
       example: {
-        message: 'Post created successfully',
+        message: 'Post criado com sucesso',
         feedId: '94619e73-843d-4313-9aa2-698b12a6af2c',
       },
     },
@@ -51,7 +51,7 @@ export class FeedController {
   ): Promise<FeedResponseDto> {
     const userId = req.user?.id;
     if (!userId) {
-      return { message: 'User not authenticated', feedId: '0' };
+      return { message: 'Usuário não autenticado', feedId: '0' };
     }
     return this.feedUseService.createPost(dto, userId);
   }
@@ -82,7 +82,7 @@ export class FeedController {
   async getFeed(@Req() req: AuthRequest, @Query() query: PaginationQueryDto) {
     const userId = req.user?.id;
     if (!userId) {
-      return { message: 'User not authenticated', feedId: '0' };
+      return { message: 'Usuário não autenticado', feedId: '0' };
     }
     const page = query.page ?? 1;
     const limit = query.limit ?? 20;
@@ -100,7 +100,7 @@ export class FeedController {
   ) {
     const userId = req.user?.id;
     if (!userId) {
-      return { message: 'User not authenticated', feedId: '0' };
+      return { message: 'Usuário não autenticado', feedId: '0' };
     }
     return this.feedUseService.getMyPost(id, userId);
   }
@@ -111,7 +111,7 @@ export class FeedController {
     description: 'Post atualizado com sucesso',
     schema: {
       example: {
-        message: 'Post updated successfully',
+        message: 'Post atualizado com sucesso',
         feedId: '94619e73-843d-4313-9aa2-698b12a6af2c',
       },
     },
@@ -123,7 +123,7 @@ export class FeedController {
   ): Promise<FeedResponseDto> {
     const userId = req.user?.id;
     if (!userId) {
-      return { message: 'User not authenticated', feedId: '0' };
+      return { message: 'Usuário não autenticado', feedId: '0' };
     }
     return this.feedUseService.updateMyPost(id, dto, userId);
   }
@@ -134,17 +134,17 @@ export class FeedController {
     description: 'Post deletado com sucesso',
     schema: {
       example: {
-        message: 'Post deleted successfully',
+        message: 'Post deletado com sucesso',
         feedId: '94619e73-843d-4313-9aa2-698b12a6af2c',
       },
     },
   })
   @ApiResponse({
     status: 404,
-    description: 'Post criado com sucesso',
+    description: 'Post não encontrado',
     schema: {
       example: {
-        message: 'Feed not found',
+        message: 'Post não encontrado',
         error: 'Not Found',
         statusCode: 404,
       },
@@ -156,8 +156,50 @@ export class FeedController {
   ): Promise<FeedResponseDto> {
     const userId = req.user?.id;
     if (!userId) {
-      return { message: 'User not authenticated', feedId: '0' };
+      return { message: 'Usuário não autenticado', feedId: '0' };
     }
     return this.feedUseService.deleteMyPost(id, userId);
+  }
+
+  @Post(':id/like')
+  @ApiOkResponse({
+    description: 'Like adicionado com sucesso',
+    schema: {
+      example: {
+        message: 'Like adicionado com sucesso',
+        feedId: '94619e73-843d-4313-9aa2-698b12a6af2c',
+      },
+    },
+  })
+  async likePost(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Req() req: AuthRequest,
+  ): Promise<FeedResponseDto> {
+    const userId = req.user?.id;
+    if (!userId) {
+      return { message: 'Usuário não autenticado', feedId: '0' };
+    }
+    return this.feedUseService.toggleLike(id, userId);
+  }
+
+  @Delete(':id/like')
+  @ApiOkResponse({
+    description: 'Like removido com sucesso',
+    schema: {
+      example: {
+        message: 'Like removido com sucesso',
+        feedId: '94619e73-843d-4313-9aa2-698b12a6af2c',
+      },
+    },
+  })
+  async unlikePost(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Req() req: AuthRequest,
+  ): Promise<FeedResponseDto> {
+    const userId = req.user?.id;
+    if (!userId) {
+      return { message: 'Usuário não autenticado', feedId: '0' };
+    }
+    return this.feedUseService.toggleLike(id, userId);
   }
 }
