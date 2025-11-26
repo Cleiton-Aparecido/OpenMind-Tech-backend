@@ -3,7 +3,6 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -25,8 +24,13 @@ export class Feed {
   @Column('text')
   content: string;
 
-  @Index('IDX_feed_userId')
-  @Column('char', { length: 36, name: 'userId' })
+  @Column('varchar', { length: 500, nullable: true, name: 'imageUrl' })
+  imageUrl?: string;
+
+  @Column('json', { nullable: true })
+  images?: string[];
+
+  @Column()
   userId: string;
 
   @ManyToOne(() => User, (user) => user.feeds, {

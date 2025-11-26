@@ -1,23 +1,22 @@
-# Dockerfile
-FROM node:20-alpine
+# Imagem base
+FROM node:22-alpine
 
-# Define diretório de trabalho
+# Diretório de trabalho
 WORKDIR /usr/src/app
 
-# Copia package.json e yarn.lock (ou package-lock.json)
-COPY package.json yarn.lock* ./
+# Copia só os arquivos de dependência primeiro (cache melhor)
+COPY package.json yarn.lock ./
 
-# Instala dependências
-RUN yarn install --production
+# Instala TODAS as dependências (incluindo dev, pq vamos compilar)
+RUN yarn install --frozen-lockfile
 
-# Copia todo o código da aplicação
+# Copia o restante do código
 COPY . .
 
-# Expõe a porta padrão (mas o Compose vai reforçar para 3023)
-EXPOSE 3000
-
-# Se você usar ts-node em dev, pode ajustar. Para produção:
+# Build do Nest (gera /dist)
 RUN yarn build
 
-# Comando padrão: usa a variável PORT definida no .env
-CMD ["node", "dist/main.js"]
+# Comando padrão do container:
+# 1) roda migrations em cima do dist
+# 2) sobe a aplicação em prod
+CMD sh -c "yarn migrate:run && yarn start:prod"

@@ -6,6 +6,8 @@ import { TypeOrmConfigService } from './config/typeorm.config';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { FeedModule } from './feed/feed.module';
+import { UsersUseCase } from './users/services/users.usecase';
+import { UsersService } from './users/services/users.service';
 
 @Module({
   imports: [
@@ -18,6 +20,12 @@ import { FeedModule } from './feed/feed.module';
     AuthModule,
     UsersModule,
     FeedModule,
+  ],
+  providers: [
+    {
+      provide: UsersUseCase,
+      useClass: UsersService,
+    },
   ],
 })
 export class AppModule {}

@@ -27,6 +27,9 @@ export class User {
   @Column('varchar', { length: 255 })
   password: string;
 
+  @Column('varchar', { length: 100, nullable: true })
+  role?: string;
+
   @CreateDateColumn({
     type: 'timestamp',
     name: 'createdAt',

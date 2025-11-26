@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsArray, IsUrl } from 'class-validator';
 
 export class FeedCreateDto {
   @ApiProperty({
@@ -17,4 +17,25 @@ export class FeedCreateDto {
   @IsOptional()
   @IsString()
   content: string;
+
+  @ApiProperty({
+    description: 'URL da imagem principal',
+    example: 'https://example.com/image.jpg',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  @IsUrl()
+  imageUrl?: string;
+
+  @ApiProperty({
+    description: 'Array de URLs de imagens',
+    example: ['https://example.com/img1.jpg', 'https://example.com/img2.jpg'],
+    required: false,
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsUrl({}, { each: true })
+  images?: string[];
 }

@@ -30,7 +30,9 @@ export class FeedService implements FeedUseCase {
       const feedData = await this.feedRepository.save({
         content: dto.content,
         title: dto.title,
-        userId,
+        userId: userId,
+        imageUrl: dto.imageUrl,
+        images: dto.images,
       });
 
       return { message: 'Post criado com sucesso', feedId: feedData.id };
@@ -44,14 +46,18 @@ export class FeedService implements FeedUseCase {
     userId: string,
     page = 1,
     limit = 20,
-  ): Promise<{ data: Feed[]; total: number; page: number; limit: number }> {
+  ): Promise<{
+    data: FeedGetDto[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
     if ('findAllByUserPaged' in this.feedRepository) {
       const feed = await this.feedRepository.findAllByUserPaged!(
         userId,
         page,
         limit,
       );
-
       return feed;
     }
 
@@ -67,7 +73,6 @@ export class FeedService implements FeedUseCase {
     return feed;
   }
 
-  /** UPDATE */
   async updateMyPost(
     id: string,
     dto: FeedUpdateDto,
