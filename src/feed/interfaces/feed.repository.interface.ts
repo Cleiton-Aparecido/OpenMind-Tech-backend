@@ -1,5 +1,4 @@
 import { DeepPartial } from 'typeorm';
-import { FeedCreateDto } from '../dto/feed-create.dto';
 import { Feed } from '../../config/entities/feed.entity';
 
 export abstract class IFeedRepository {
