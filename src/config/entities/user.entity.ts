@@ -10,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Feed } from './feed.entity';
+import { FeedLike } from './feed-like.entity';
 
 @Entity({ name: 'users' })
 @Index('UQ_users_email', ['email'], { unique: true })
@@ -46,4 +47,7 @@ export class User {
 
   @OneToMany(() => Feed, (feed) => feed.user)
   feeds: Feed[];
+
+  @OneToMany(() => FeedLike, (like) => like.user)
+  feedLikes: FeedLike[];
 }

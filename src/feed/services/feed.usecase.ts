@@ -6,8 +6,8 @@ import { Feed } from 'src/config/entities/feed.entity';
 export abstract class FeedUseCase {
   /**
    * Cria um novo post.
-   * @param dto Dados do post (título, conteúdo)
-   * @param userId ID do usuário autenticado
+   * @param dto 
+   * @param userId 
    */
   abstract createPost(
     dto: FeedCreateDto,
@@ -16,9 +16,9 @@ export abstract class FeedUseCase {
 
   /**
    * Lista os posts do usuário autenticado (com paginação opcional).
-   * @param userId ID do usuário autenticado
-   * @param page Página atual
-   * @param limit Quantidade de itens por página
+   * @param userId 
+   * @param page 
+   * @param limit 
    */
   abstract listMyFeed(
     userId: string,
@@ -28,16 +28,16 @@ export abstract class FeedUseCase {
 
   /**
    * Busca um post específico do usuário autenticado.
-   * @param id ID do post
-   * @param userId ID do usuário autenticado
+   * @param id
+   * @param userId 
    */
   abstract getMyPost(id: string, userId: string): Promise<Feed>;
 
   /**
    * Atualiza um post do usuário autenticado.
-   * @param id ID do post
-   * @param dto Dados a atualizar (título/conteúdo)
-   * @param userId ID do usuário autenticado
+   * @param id 
+   * @param dto 
+   * @param userId 
    */
   abstract updateMyPost(
     id: string,
@@ -47,8 +47,15 @@ export abstract class FeedUseCase {
 
   /**
    * Exclui um post do usuário autenticado.
-   * @param id ID do post
-   * @param userId ID do usuário autenticado
+   * @param id 
+   * @param userId 
    */
   abstract deleteMyPost(id: string, userId: string): Promise<FeedResponseDto>;
+
+  /**
+   * Alterna o like em um post (adiciona se não existe, remove se existe).
+   * @param feedId 
+   * @param userId 
+   */
+  abstract toggleLike(feedId: string, userId: string): Promise<FeedResponseDto>;
 }

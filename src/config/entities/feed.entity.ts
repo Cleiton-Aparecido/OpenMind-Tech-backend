@@ -6,11 +6,13 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { User } from './user.entity';
+import { FeedLike } from './feed-like.entity';
 
 @Entity({ name: 'feed' })
 export class Feed {
@@ -37,6 +39,9 @@ export class Feed {
     foreignKeyConstraintName: 'FK_feed_userId__users_id',
   })
   user: User;
+
+  @OneToMany(() => FeedLike, (like) => like.feed)
+  likes: FeedLike[];
 
   @CreateDateColumn({
     type: 'timestamp',

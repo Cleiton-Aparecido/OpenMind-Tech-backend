@@ -36,23 +36,49 @@ export class FeedRepository implements IFeedRepository {
     page = 1,
     limit = 20,
   ): Promise<{ data: any; total: number; page: number; limit: number }> {
-    const [feeds, total] = await this.feedRepository
+    // Busca os feeds com user e contagem de likes
+    const queryBuilder = this.feedRepository
       .createQueryBuilder('feed')
-      .innerJoinAndSelect('feed.user', 'user')
-      // .where('feed.userId = :userId', { userId })
+      .leftJoinAndSelect('feed.user', 'user')
+      .leftJoin('feed.likes', 'likes')
+      .leftJoin('feed.likes', 'userLike', 'userLike.userId = :userId', { userId })
+      .select([
+        'feed.id',
+        'feed.title',
+        'feed.content',
+        'feed.createdAt',
+        'feed.userId',
+        'user.id',
+        'user.name',
+      ])
+      .addSelect('COUNT(DISTINCT likes.id)', 'likesCount')
+      .addSelect('MAX(CASE WHEN userLike.id IS NOT NULL THEN 1 ELSE 0 END)', 'hasLiked')
+      .groupBy('feed.id')
+      .addGroupBy('user.id')
       .orderBy('feed.createdAt', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
-      .getManyAndCount();
+      .offset((page - 1) * limit)
+      .limit(limit);
 
-    const data = feeds.map((f) => ({
-      id: f.id,
-      title: f.title,
-      content: f.content,
-      createdAt: f.createdAt,
-      userId: f.userId,
-      userName: f.user?.name,
-    }));
+    const result = await queryBuilder.getRawAndEntities();
+    
+    const total = await this.feedRepository
+      .createQueryBuilder('feed')
+      .getCount();
+
+    const data = result.entities.map((f, index) => {
+      const raw = result.raw[index];
+      return {
+        id: f.id,
+        title: f.title,
+        content: f.content,
+        createdAt: f.createdAt,
+        userId: f.userId,
+        userName: f.user?.name,
+        edit: f.userId === userId,
+        likesCount: parseInt(raw.likesCount) || 0,
+        hasLiked: parseInt(raw.hasLiked) === 1,
+      };
+    });
 
     return { data, total, page, limit };
   }
