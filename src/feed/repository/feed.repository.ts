@@ -32,13 +32,28 @@ export class FeedRepository implements IFeedRepository {
     page = 1,
     limit = 20,
   ): Promise<{ data: any; total: number; page: number; limit: number }> {
-    const [feeds, total] = await this.feedRepository
+    // Busca os feeds com user e contagem de likes
+    const queryBuilder = this.feedRepository
       .createQueryBuilder('feed')
-      .innerJoinAndSelect('feed.user', 'user')
+      .leftJoinAndSelect('feed.user', 'user')
+      .leftJoin('feed.likes', 'likes')
+      .leftJoin('feed.likes', 'userLike', 'userLike.userId = :userId', { userId })
+      .select([
+        'feed.id',
+        'feed.title',
+        'feed.content',
+        'feed.createdAt',
+        'feed.userId',
+        'user.id',
+        'user.name',
+      ])
+      .addSelect('COUNT(DISTINCT likes.id)', 'likesCount')
+      .addSelect('MAX(CASE WHEN userLike.id IS NOT NULL THEN 1 ELSE 0 END)', 'hasLiked')
+      .groupBy('feed.id')
+      .addGroupBy('user.id')
       .orderBy('feed.createdAt', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
-      .getManyAndCount();
+      .offset((page - 1) * limit)
+      .limit(limit);
 
     const data = feeds.map((f) => ({
       id: f.id,
