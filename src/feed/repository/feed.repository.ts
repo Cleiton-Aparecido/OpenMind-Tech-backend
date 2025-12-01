@@ -55,26 +55,17 @@ export class FeedRepository implements IFeedRepository {
       .offset((page - 1) * limit)
       .limit(limit);
 
-    const result = await queryBuilder.getRawAndEntities();
-    
-    const total = await this.feedRepository
-      .createQueryBuilder('feed')
-      .getCount();
-
-    const data = result.entities.map((f, index) => {
-      const raw = result.raw[index];
-      return {
-        id: f.id,
-        title: f.title,
-        content: f.content,
-        createdAt: f.createdAt,
-        userId: f.userId,
-        userName: f.user?.name,
-        edit: f.userId === userId,
-        likesCount: parseInt(raw.likesCount) || 0,
-        hasLiked: parseInt(raw.hasLiked) === 1,
-      };
-    });
+    const data = feeds.map((f) => ({
+      id: f.id,
+      title: f.title,
+      content: f.content,
+      imageUrl: f.imageUrl,
+      images: f.images,
+      createdAt: f.createdAt,
+      userId: f.userId,
+      userName: f.user?.name,
+      edit: f.userId === userId, 
+    }));
 
     return { data, total, page, limit };
   }
