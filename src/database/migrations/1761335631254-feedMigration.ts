@@ -4,6 +4,13 @@ import {
   Table,
   TableForeignKey,
 } from 'typeorm';
+import {
+  resolveDateDefault,
+  resolveDateType,
+  resolveGenerationStrategy,
+  resolveIdDefault,
+  resolveIdType,
+} from '../util/helper-migrate';
 
 export class NewMigration1761335631254 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -16,11 +23,11 @@ export class NewMigration1761335631254 implements MigrationInterface {
         columns: [
           {
             name: 'id',
-            type: this.resolveIdType(dbType),
+            type: resolveIdType(dbType),
             isPrimary: true,
             isNullable: false,
-            generationStrategy: this.resolveGenerationStrategy(dbType),
-            default: this.resolveIdDefault(dbType),
+            generationStrategy: resolveGenerationStrategy(dbType),
+            default: resolveIdDefault(dbType),
           },
           {
             name: 'title',
@@ -35,24 +42,24 @@ export class NewMigration1761335631254 implements MigrationInterface {
           },
           {
             name: 'userId',
-            type: this.resolveIdType(dbType),
+            type: resolveIdType(dbType),
             isNullable: false,
           },
           {
             name: 'createdAt',
-            type: this.resolveDateType(dbType),
-            default: this.resolveDateDefault(dbType),
+            type: resolveDateType(dbType),
+            default: resolveDateDefault(dbType),
             isNullable: false,
           },
           {
             name: 'updatedAt',
-            type: this.resolveDateType(dbType),
-            default: this.resolveDateDefault(dbType),
+            type: resolveDateType(dbType),
+            default: resolveDateDefault(dbType),
             isNullable: false,
           },
           {
             name: 'deletedAt',
-            type: this.resolveDateType(dbType),
+            type: resolveDateType(dbType),
             isNullable: true,
           },
         ],

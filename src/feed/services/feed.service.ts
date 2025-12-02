@@ -12,6 +12,7 @@ import { FeedResponseDto } from '../dto/feed-response.dto';
 import { FeedUpdateDto } from '../dto/feed-update.dto';
 import { Feed } from 'src/config/entities/feed.entity';
 import { FeedLike } from 'src/config/entities/feed-like.entity';
+import { FeedGetDto } from '../dto/feed-get.dto';
 
 @Injectable()
 export class FeedService implements FeedUseCase {
@@ -69,7 +70,9 @@ export class FeedService implements FeedUseCase {
     const feed = await this.feedRepository.findById(id);
     if (!feed) throw new NotFoundException('Post não encontrado');
     if (feed.userId !== userId)
-      throw new ForbiddenException('Você não tem permissão para visualizar este post');
+      throw new ForbiddenException(
+        'Você não tem permissão para visualizar este post',
+      );
     return feed;
   }
 
@@ -81,7 +84,9 @@ export class FeedService implements FeedUseCase {
     const feed = await this.feedRepository.findById(id);
     if (!feed) throw new NotFoundException('Post não encontrado');
     if (feed.userId !== userId)
-      throw new ForbiddenException('Você não tem permissão para editar este post');
+      throw new ForbiddenException(
+        'Você não tem permissão para editar este post',
+      );
 
     if ('updateById' in this.feedRepository) {
       await this.feedRepository.updateById!(id, dto);
@@ -97,7 +102,9 @@ export class FeedService implements FeedUseCase {
     const feed = await this.feedRepository.findById(id);
     if (!feed) throw new NotFoundException('Post não encontrado');
     if (feed.userId !== userId)
-      throw new ForbiddenException('Você não tem permissão para deletar este post');
+      throw new ForbiddenException(
+        'Você não tem permissão para deletar este post',
+      );
 
     const deleted = await this.feedRepository.deleteById(id);
     if (!deleted) throw new NotFoundException('Post não encontrado');
@@ -105,9 +112,7 @@ export class FeedService implements FeedUseCase {
     return { message: 'Post deletado com sucesso', feedId: id };
   }
 
- 
   async toggleLike(feedId: string, userId: string): Promise<FeedResponseDto> {
-  
     const feed = await this.feedRepository.findById(feedId);
     if (!feed) throw new NotFoundException('Post não encontrado');
 

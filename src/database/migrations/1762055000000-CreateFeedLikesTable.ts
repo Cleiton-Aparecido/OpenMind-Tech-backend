@@ -1,27 +1,36 @@
-import { MigrationInterface, QueryRunner, Table, TableIndex, TableForeignKey } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableIndex,
+  TableForeignKey,
+} from 'typeorm';
+import { resolveIdType } from '../util/helper-migrate';
 
 export class CreateFeedLikesTable1762055000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    const dbType = queryRunner.connection.options.type;
+
     await queryRunner.createTable(
       new Table({
         name: 'feed_likes',
         columns: [
           {
             name: 'id',
-            type: 'char',
+            type: 'varchar',
             length: '36',
             isPrimary: true,
             generationStrategy: 'uuid',
           },
           {
             name: 'feedId',
-            type: 'char',
-            length: '36',
+            type: resolveIdType(dbType),
+            isNullable: false,
           },
           {
             name: 'userId',
-            type: 'char',
-            length: '36',
+            type: resolveIdType(dbType),
+            isNullable: false,
           },
           {
             name: 'createdAt',
