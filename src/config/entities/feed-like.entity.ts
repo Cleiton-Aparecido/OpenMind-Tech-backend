@@ -18,11 +18,17 @@ export class FeedLike {
   id: string;
 
   @Index('IDX_feedLike_feedId')
-  @Column('char', { length: 36, name: 'feedId' })
+  @Column({
+    name: 'feedId',
+    type: 'uuid', // ✅ mesmo tipo do id do Feed
+  })
   feedId: string;
 
   @Index('IDX_feedLike_userId')
-  @Column('char', { length: 36, name: 'userId' })
+  @Column({
+    name: 'userId',
+    type: 'uuid', // ✅ mesmo tipo do id do User
+  })
   userId: string;
 
   @ManyToOne(() => Feed, (feed) => feed.likes, {

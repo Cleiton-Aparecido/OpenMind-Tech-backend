@@ -1,4 +1,11 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import {
+  resolveDateDefault,
+  resolveDateType,
+  resolveGenerationStrategy,
+  resolveIdDefault,
+  resolveIdType,
+} from '../util/helper-migrate';
 
 export class CreateTable1749004271881 implements MigrationInterface {
   name = 'CreateTable1749004271881';
@@ -12,11 +19,11 @@ export class CreateTable1749004271881 implements MigrationInterface {
         columns: [
           {
             name: 'id',
-            type: this.resolveIdType(dbType),
+            type: resolveIdType(dbType),
             isPrimary: true,
             isNullable: false,
-            generationStrategy: this.resolveGenerationStrategy(dbType),
-            default: this.resolveIdDefault(dbType),
+            generationStrategy: resolveGenerationStrategy(dbType),
+            default: resolveIdDefault(dbType),
           },
           {
             name: 'name',
@@ -39,19 +46,19 @@ export class CreateTable1749004271881 implements MigrationInterface {
           },
           {
             name: 'createdAt',
-            type: this.resolveDateType(dbType),
-            default: this.resolveDateDefault(dbType),
+            type: resolveDateType(dbType),
+            default: resolveDateDefault(dbType),
             isNullable: false,
           },
           {
             name: 'updatedAt',
-            type: this.resolveDateType(dbType),
-            default: this.resolveDateDefault(dbType),
+            type: resolveDateType(dbType),
+            default: resolveDateDefault(dbType),
             isNullable: false,
           },
           {
             name: 'deletedAt',
-            type: this.resolveDateType(dbType),
+            type: resolveDateType(dbType),
             isNullable: true,
           },
         ],
@@ -62,60 +69,5 @@ export class CreateTable1749004271881 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropTable('users');
-  }
-
-  // === Helpers para adaptar tipos conforme o banco ===
-
-  private resolveIdType(db: string): string {
-    switch (db) {
-      case 'postgres':
-        return 'uuid';
-      case 'mssql':
-        return 'uniqueidentifier';
-      case 'sqlite':
-        return 'text';
-      default:
-        return 'char';
-    }
-  }
-
-  private resolveGenerationStrategy(db: string): 'uuid' | undefined {
-    return db === 'postgres' ? 'uuid' : undefined;
-  }
-
-  private resolveIdDefault(db: string): string | undefined {
-    switch (db) {
-      case 'postgres':
-        return 'gen_random_uuid()';
-      case 'mysql':
-      case 'mariadb':
-        return '(UUID())';
-      case 'mssql':
-        return 'NEWID()';
-      case 'sqlite':
-        return '(lower(hex(randomblob(16))))';
-      default:
-        return undefined;
-    }
-  }
-
-  private resolveDateType(db: string): string {
-    return db === 'mssql' ? 'datetime' : 'timestamp';
-  }
-
-  private resolveDateDefault(db: string): string {
-    switch (db) {
-      case 'postgres':
-        return 'now()';
-      case 'mysql':
-      case 'mariadb':
-        return 'CURRENT_TIMESTAMP';
-      case 'sqlite':
-        return "(datetime('now'))";
-      case 'mssql':
-        return 'GETDATE()';
-      default:
-        return 'CURRENT_TIMESTAMP';
-    }
   }
 }
