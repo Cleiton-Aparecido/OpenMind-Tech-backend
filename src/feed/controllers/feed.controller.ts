@@ -26,6 +26,8 @@ import {
   UploadImageDto,
   UploadImageResponseDto,
 } from '../dto/upload-image.dto';
+import { FeedCommentCreateDto } from '../dto/feed-comment-create.dto';
+import { FeedCommentUpdateDto } from '../dto/feed-comment-update.dto';
 
 type AuthRequest = Request & {
   user?: { id: string; email: string; name?: string };
@@ -223,5 +225,50 @@ export class FeedController {
     @Body() dto: UploadImageDto,
   ): Promise<UploadImageResponseDto> {
     return this.feedUseService.uploadImage(dto.imageBase64);
+  }
+
+  @Post(':id/comments')
+  async addComment(
+    @Param('id', new ParseUUIDPipe()) feedId: string,
+    @Body() dto: FeedCommentCreateDto,
+    @Req() req: AuthRequest,
+  ) {
+    const userId = req.user?.id;
+    if (!userId) return { message: 'Usuário não autenticado' };
+    return this.feedUseService.addComment(feedId, userId, dto);
+  }
+
+  @Get(':id/comments')
+  async listComments(
+    @Param('id', new ParseUUIDPipe()) feedId: string,
+    @Req() req: AuthRequest,
+    @Query() query: PaginationQueryDto,
+  ) {
+    const userId = req.user?.id;
+    if (!userId) return { message: 'Usuário não autenticado' };
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    return this.feedUseService.listComments(feedId, userId, page, limit);
+  }
+
+  @Put('comments/:commentId')
+  async updateComment(
+    @Param('commentId', new ParseUUIDPipe()) commentId: string,
+    @Body() dto: FeedCommentUpdateDto,
+    @Req() req: AuthRequest,
+  ) {
+    const userId = req.user?.id;
+    if (!userId) return { message: 'Usuário não autenticado' };
+    return this.feedUseService.updateComment(commentId, userId, dto);
+  }
+
+  @Delete('comments/:commentId')
+  async deleteComment(
+    @Param('commentId', new ParseUUIDPipe()) commentId: string,
+    @Req() req: AuthRequest,
+  ) {
+    const userId = req.user?.id;
+    if (!userId) return { message: 'Usuário não autenticado' };
+    return this.feedUseService.deleteComment(commentId, userId);
   }
 }

@@ -13,6 +13,10 @@ import { FeedUpdateDto } from '../dto/feed-update.dto';
 import { Feed } from 'src/config/entities/feed.entity';
 import { FeedLike } from 'src/config/entities/feed-like.entity';
 import { FeedGetDto } from '../dto/feed-get.dto';
+import { FeedComment } from 'src/config/entities/feed-comment.entity';
+import { FeedCommentCreateDto } from '../dto/feed-comment-create.dto';
+import { FeedCommentUpdateDto } from '../dto/feed-comment-update.dto';
+import { FeedCommentDto } from '../dto/feed-comment.dto';
 
 @Injectable()
 export class FeedService implements FeedUseCase {
@@ -20,6 +24,8 @@ export class FeedService implements FeedUseCase {
     private readonly feedRepository: IFeedRepository,
     @InjectRepository(FeedLike)
     private readonly feedLikeRepository: Repository<FeedLike>,
+    @InjectRepository(FeedComment)
+    private readonly feedCommentRepository: Repository<FeedComment>,
   ) {}
 
   /** CREATE */
@@ -146,5 +152,93 @@ export class FeedService implements FeedUseCase {
 
     // Retorna a própria string Base64 para ser salva
     return { imageUrl: imageBase64 };
+  }
+  async addComment(feedId: string, userId: string, dto: FeedCommentCreateDto) {
+    const feed = await this.feedRepository.findById(feedId);
+    if (!feed) throw new NotFoundException('Post não encontrado');
+
+    const comment = this.feedCommentRepository.create({
+      feedId,
+      userId,
+      content: dto.content,
+    });
+
+    const saved = await this.feedCommentRepository.save(comment);
+    return {
+      message: 'Comentário adicionado com sucesso',
+      commentId: saved.id,
+      feedId,
+    };
+  }
+
+  async listComments(
+    feedId: string,
+    userId: string,
+    page = 1,
+    limit = 20,
+  ): Promise<{
+    data: FeedCommentDto[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const [rows, total] = await this.feedCommentRepository.findAndCount({
+      where: { feedId, deletedAt: null as any },
+      relations: { user: true } as any,
+      order: { createdAt: 'ASC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    const data = rows.map((c: any) => ({
+      id: c.id,
+      feedId: c.feedId,
+      userId: c.userId,
+      userName: c.user?.name,
+      content: c.content,
+      createdAt: c.createdAt,
+      updatedAt: c.updatedAt,
+      edit: c.userId === userId,
+    }));
+
+    return { data, total, page, limit };
+  }
+
+  async updateComment(
+    commentId: string,
+    userId: string,
+    dto: FeedCommentUpdateDto,
+  ) {
+    const comment = await this.feedCommentRepository.findOne({
+      where: { id: commentId },
+    });
+    if (!comment || comment.deletedAt)
+      throw new NotFoundException('Comentário não encontrado');
+    if (comment.userId !== userId)
+      throw new ForbiddenException(
+        'Você não tem permissão para editar este comentário',
+      );
+
+    comment.content = dto.content;
+    await this.feedCommentRepository.save(comment);
+
+    return { message: 'Comentário atualizado com sucesso', commentId };
+  }
+
+  async deleteComment(commentId: string, userId: string) {
+    const comment = await this.feedCommentRepository.findOne({
+      where: { id: commentId },
+    });
+    if (!comment || comment.deletedAt)
+      throw new NotFoundException('Comentário não encontrado');
+    if (comment.userId !== userId)
+      throw new ForbiddenException(
+        'Você não tem permissão para deletar este comentário',
+      );
+
+    comment.deletedAt = new Date();
+    await this.feedCommentRepository.save(comment);
+
+    return { message: 'Comentário removido com sucesso', commentId };
   }
 }

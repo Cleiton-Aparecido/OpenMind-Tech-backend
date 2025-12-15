@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { Feed } from './feed.entity';
 import { FeedLike } from './feed-like.entity';
+import { FeedComment } from './feed-comment.entity';
 
 @Entity({ name: 'users' })
 @Index('UQ_users_email', ['email'], { unique: true })
@@ -29,6 +30,9 @@ export class User {
 
   @Column('varchar', { length: 100, nullable: true })
   role?: string;
+
+  @OneToMany(() => FeedComment, (comment) => comment.user)
+  feedComments: FeedComment[];
 
   @CreateDateColumn({
     type: 'timestamp',

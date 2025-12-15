@@ -32,12 +32,18 @@ export class FeedRepository implements IFeedRepository {
     page = 1,
     limit = 20,
   ): Promise<{ data: any; total: number; page: number; limit: number }> {
-    // Busca os feeds com user e contagem de likes
+    // Busca os feeds com user, contagem de likes e contagem de comentários
     const queryBuilder = this.feedRepository
       .createQueryBuilder('feed')
       .leftJoinAndSelect('feed.user', 'user')
       .leftJoin('feed.likes', 'likes')
-      .leftJoin('feed_likes', 'userLike', 'userLike.feedId = feed.id AND userLike.userId = :userId', { userId })
+      .leftJoin('feed.comments', 'comments') // ✅ NOVO: join comments (precisa da relação no Feed)
+      .leftJoin(
+        'feed_likes',
+        'userLike',
+        'userLike.feedId = feed.id AND userLike.userId = :userId',
+        { userId },
+      )
       .select([
         'feed.id',
         'feed.title',
@@ -50,7 +56,11 @@ export class FeedRepository implements IFeedRepository {
         'user.name',
       ])
       .addSelect('COALESCE(COUNT(DISTINCT likes.id), 0)', 'likesCount')
-      .addSelect('COALESCE(MAX(CASE WHEN userLike.id IS NOT NULL THEN 1 ELSE 0 END), 0)', 'hasLiked')
+      .addSelect('COALESCE(COUNT(DISTINCT comments.id), 0)', 'commentsCount') // ✅ NOVO
+      .addSelect(
+        'COALESCE(MAX(CASE WHEN userLike.id IS NOT NULL THEN 1 ELSE 0 END), 0)',
+        'hasLiked',
+      )
       .groupBy('feed.id')
       .addGroupBy('user.id')
       .orderBy('feed.createdAt', 'DESC')
@@ -58,7 +68,7 @@ export class FeedRepository implements IFeedRepository {
       .limit(limit);
 
     const result = await queryBuilder.getRawAndEntities();
-    
+
     const total = await this.feedRepository
       .createQueryBuilder('feed')
       .getCount();
@@ -66,6 +76,8 @@ export class FeedRepository implements IFeedRepository {
     const data = result.entities.map((f, index) => {
       const raw = result.raw[index];
       const likesCount = parseInt(raw.likesCount) || 0;
+      const commentsCount = parseInt(raw.commentsCount) || 0; // ✅ NOVO
+
       return {
         id: f.id,
         title: f.title,
@@ -77,6 +89,7 @@ export class FeedRepository implements IFeedRepository {
         userName: f.user?.name,
         edit: f.userId === userId,
         ...(likesCount > 0 && { likesCount }),
+        ...(commentsCount > 0 && { commentsCount }), // ✅ NOVO (só aparece quando > 0)
         hasLiked: parseInt(raw.hasLiked) === 1,
       };
     });
