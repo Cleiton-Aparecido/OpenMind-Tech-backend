@@ -22,6 +22,7 @@ import { FeedUpdateDto } from '../dto/feed-update.dto';
 import { FeedUseCase } from '../services/feed.usecase';
 import { FeedResponseDto } from '../dto/feed-response.dto';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { UploadImageDto, UploadImageResponseDto } from '../dto/upload-image.dto';
 
 type AuthRequest = Request & {
   user?: { id: string; email: string; name?: string };
@@ -201,5 +202,17 @@ export class FeedController {
       return { message: 'Usuário não autenticado', feedId: '0' };
     }
     return this.feedUseService.toggleLike(id, userId);
+  }
+
+  @Post('upload-image')
+  @ApiResponse({
+    status: 200,
+    description: 'Imagem processada com sucesso',
+    type: UploadImageResponseDto,
+  })
+  async uploadImage(
+    @Body() dto: UploadImageDto,
+  ): Promise<UploadImageResponseDto> {
+    return this.feedUseService.uploadImage(dto.imageBase64);
   }
 }

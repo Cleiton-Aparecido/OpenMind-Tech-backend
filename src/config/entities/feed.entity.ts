@@ -24,7 +24,7 @@ export class Feed {
   @Column('text')
   content: string;
 
-  @Column('varchar', { length: 500, nullable: true, name: 'imageUrl' })
+  @Column('text', { nullable: true, name: 'imageUrl' })
   imageUrl?: string;
 
   @Column('json', { nullable: true })
