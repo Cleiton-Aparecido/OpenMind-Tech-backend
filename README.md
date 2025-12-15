@@ -1,4 +1,4 @@
-## Nome do Projeto: OpenMind Tech Backend
+## OpenMind Tech Backend
 
 ### Objetivo do projeto:
 
@@ -31,7 +31,6 @@ Profissionais da área da tecnologia da informação.
 
 **Integrantes:** Cleiton, Pedro Mesquita, Nycollas Machado e Vinicius Lima.
 
-Projeto em desenvolvimento...
 
 ## Project setup
 
