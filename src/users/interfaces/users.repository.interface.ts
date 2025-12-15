@@ -10,4 +10,7 @@ export abstract class IUsersRepository {
   abstract findByEmail(email: string);
   abstract findActiveByIdWithPassword(id: string): Promise<User | null>;
   abstract updatePassword(id: string, passwordHash: string): Promise<void>;
+
+  // novo método para atualização genérica de dados do usuário
+  abstract update(id: string, data: DeepPartial<User>): Promise<User>;
 }

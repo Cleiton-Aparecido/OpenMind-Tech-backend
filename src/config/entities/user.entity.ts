@@ -1,13 +1,12 @@
 import {
   Entity,
   Column,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
   Index,
-  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Feed } from './feed.entity';
 import { FeedLike } from './feed-like.entity';
@@ -29,6 +28,15 @@ export class User {
 
   @Column('varchar', { length: 100, nullable: true })
   role?: string;
+
+  @Column({ type: 'date', nullable: true })
+  birthdate?: Date;
+
+  @Column('varchar', { length: 100, nullable: true })
+  profession?: string;
+
+  @Column('varchar', { length: 100, nullable: true })
+  specialty?: string;
 
   @CreateDateColumn({
     type: 'timestamp',

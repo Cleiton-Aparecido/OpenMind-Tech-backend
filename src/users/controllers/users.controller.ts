@@ -10,12 +10,13 @@ import {
   ParseUUIDPipe,
   Param,
 } from '@nestjs/common';
-import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { ChangePasswordDto } from '../dto/change-password.dto';
 import { UsersUseCase } from '../services/users.usecase';
+import { UpdateUserDto } from '../dto/update-user.dto';
+
 type AuthRequest = Request & {
   user?: { id: string; email: string; name?: string };
 };
@@ -60,7 +61,7 @@ export class UsersController {
   })
   @ApiResponse({
     status: 409,
-    description: 'Usuário criado com sucesso',
+    description: 'E-mail já cadastrado',
     example: {
       message: 'E-mail já cadastrado',
       error: 'Conflict',
@@ -106,6 +107,20 @@ export class UsersController {
     const safeUser = await this.usersService.get(userId);
     return safeUser;
   }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Atualizar dados do usuário' })
+  @ApiResponse({
+    status: 200,
+    description: 'Usuário atualizado com sucesso',
+  })
+  async update(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() dto: UpdateUserDto,
+  ) {
+    return this.usersService.update(id, dto);
+  }
+
   @Patch(':id/password')
   @ApiResponse({
     status: 400,

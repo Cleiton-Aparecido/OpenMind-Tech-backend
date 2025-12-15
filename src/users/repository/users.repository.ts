@@ -75,4 +75,23 @@ export class UsersRepository implements IUsersRepository {
       throw new Error('Usuário não encontrado ou inativo');
     }
   }
+
+  // 🔽 novo método para atualizar dados gerais do usuário
+  async update(id: string, data: DeepPartial<User>): Promise<User> {
+    await this.userRepository.update(
+      { id, deletedAt: IsNull() },
+      data,
+    );
+
+    // retorna o usuário atualizado
+    const updated = await this.userRepository.findOne({
+      where: { id, deletedAt: IsNull() },
+    });
+
+    if (!updated) {
+      throw new Error('Usuário não encontrado ou inativo');
+    }
+
+    return updated;
+  }
 }
