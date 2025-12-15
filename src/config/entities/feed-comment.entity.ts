@@ -3,53 +3,53 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
+import { Feed } from './feed.entity';
 import { User } from './user.entity';
-import { FeedLike } from './feed-like.entity';
-import { FeedComment } from './feed-comment.entity';
 
-@Entity({ name: 'feed' })
-export class Feed {
+@Entity({ name: 'feed_comments' })
+export class FeedComment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('varchar', { length: 255 })
-  title: string;
+  @Index('IDX_feedComment_feedId')
+  @Column({ name: 'feedId', type: 'uuid' })
+  feedId: string;
+
+  @Index('IDX_feedComment_userId')
+  @Column({ name: 'userId', type: 'uuid' })
+  userId: string;
 
   @Column('text')
   content: string;
 
-  @Column('text', { nullable: true, name: 'imageUrl' })
-  imageUrl?: string;
+  @ManyToOne(() => Feed, (feed) => feed.comments, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({
+    name: 'feedId',
+    referencedColumnName: 'id',
+    foreignKeyConstraintName: 'FK_feedComment_feedId__feed_id',
+  })
+  feed: Feed;
 
-  @Column('json', { nullable: true })
-  images?: string[];
-
-  @Column()
-  userId: string;
-
-  @ManyToOne(() => User, (user) => user.feeds, {
+  @ManyToOne(() => User, (user) => user.feedComments, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn({
     name: 'userId',
     referencedColumnName: 'id',
-    foreignKeyConstraintName: 'FK_feed_userId__users_id',
+    foreignKeyConstraintName: 'FK_feedComment_userId__users_id',
   })
   user: User;
-
-  @OneToMany(() => FeedLike, (like) => like.feed)
-  likes: FeedLike[];
-
-  @OneToMany(() => FeedComment, (comment) => comment.feed)
-  comments: FeedComment[];
 
   @CreateDateColumn({
     type: 'timestamp',
