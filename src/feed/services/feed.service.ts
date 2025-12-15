@@ -113,7 +113,12 @@ export class FeedService implements FeedUseCase {
   }
 
   async toggleLike(feedId: string, userId: string): Promise<FeedResponseDto> {
+    console.log(feedId);
+
     const feed = await this.feedRepository.findById(feedId);
+
+    console.log(feed);
+
     if (!feed) throw new NotFoundException('Post não encontrado');
 
     const existingLike = await this.feedLikeRepository.findOne({
@@ -121,10 +126,13 @@ export class FeedService implements FeedUseCase {
     });
 
     if (existingLike) {
+      console.log('existingLike');
       await this.feedLikeRepository.remove(existingLike);
       return { message: 'Like removido com sucesso', feedId };
     } else {
-      const newLike = this.feedLikeRepository.create({ feedId, userId });
+      console.log('newLike');
+      const newLike = await this.feedLikeRepository.create({ feedId, userId });
+      console.log(newLike);
       await this.feedLikeRepository.save(newLike);
       return { message: 'Like adicionado com sucesso', feedId };
     }
