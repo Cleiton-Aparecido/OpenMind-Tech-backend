@@ -5,7 +5,11 @@ import {
   TableIndex,
   TableForeignKey,
 } from 'typeorm';
-import { resolveIdType } from '../util/helper-migrate';
+import {
+  resolveGenerationStrategy,
+  resolveIdDefault,
+  resolveIdType,
+} from '../util/helper-migrate';
 
 export class CreateFeedLikesTable1762055000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -19,8 +23,9 @@ export class CreateFeedLikesTable1762055000000 implements MigrationInterface {
             name: 'id',
             type: resolveIdType(dbType),
             isPrimary: true,
-            isGenerated: true,
-            generationStrategy: 'uuid',
+            isNullable: false,
+            generationStrategy: resolveGenerationStrategy(dbType),
+            default: resolveIdDefault(dbType),
           },
           {
             name: 'feedId',

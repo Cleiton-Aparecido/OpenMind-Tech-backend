@@ -22,7 +22,10 @@ import { FeedUpdateDto } from '../dto/feed-update.dto';
 import { FeedUseCase } from '../services/feed.usecase';
 import { FeedResponseDto } from '../dto/feed-response.dto';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
-import { UploadImageDto, UploadImageResponseDto } from '../dto/upload-image.dto';
+import {
+  UploadImageDto,
+  UploadImageResponseDto,
+} from '../dto/upload-image.dto';
 
 type AuthRequest = Request & {
   user?: { id: string; email: string; name?: string };
@@ -68,7 +71,10 @@ export class FeedController {
             title: 'Estudo sobre NestJS',
             content: 'Conteúdo do post...',
             imageUrl: 'https://example.com/image.jpg',
-            images: ['https://example.com/img1.jpg', 'https://example.com/img2.jpg'],
+            images: [
+              'https://example.com/img1.jpg',
+              'https://example.com/img2.jpg',
+            ],
             userId: '0ecf3512-b45f-4443-85b9-80142ff278a6',
             userName: 'João Silva',
             createdAt: '2025-10-25T12:00:00.000Z',
@@ -177,6 +183,9 @@ export class FeedController {
     @Req() req: AuthRequest,
   ): Promise<FeedResponseDto> {
     const userId = req.user?.id;
+
+    console.log('User ID:', userId); // Log do userId para depuração
+
     if (!userId) {
       return { message: 'Usuário não autenticado', feedId: '0' };
     }
