@@ -3,6 +3,7 @@ import { FeedUpdateDto } from '../dto/feed-update.dto';
 import { FeedResponseDto } from '../dto/feed-response.dto';
 import { Feed } from 'src/config/entities/feed.entity';
 import { FeedGetDto } from '../dto/feed-get.dto';
+import { UploadImageResponseDto } from '../dto/upload-image.dto';
 
 export abstract class FeedUseCase {
   /**
@@ -64,4 +65,10 @@ export abstract class FeedUseCase {
    * @param userId 
    */
   abstract toggleLike(feedId: string, userId: string): Promise<FeedResponseDto>;
+
+  /**
+   * Processa e retorna a imagem em Base64 para ser salva no banco.
+   * @param imageBase64 
+   */
+  abstract uploadImage(imageBase64: string): Promise<UploadImageResponseDto>;
 }

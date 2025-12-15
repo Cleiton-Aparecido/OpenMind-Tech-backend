@@ -129,4 +129,14 @@ export class FeedService implements FeedUseCase {
       return { message: 'Like adicionado com sucesso', feedId };
     }
   }
+
+  async uploadImage(imageBase64: string): Promise<{ imageUrl: string }> {
+    // Valida se é uma string Base64 válida
+    if (!imageBase64.startsWith('data:image/')) {
+      throw new Error('Formato de imagem inválido');
+    }
+
+    // Retorna a própria string Base64 para ser salva
+    return { imageUrl: imageBase64 };
+  }
 }

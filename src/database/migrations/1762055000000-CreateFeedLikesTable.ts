@@ -17,9 +17,9 @@ export class CreateFeedLikesTable1762055000000 implements MigrationInterface {
         columns: [
           {
             name: 'id',
-            type: 'varchar',
-            length: '36',
+            type: resolveIdType(dbType),
             isPrimary: true,
+            isGenerated: true,
             generationStrategy: 'uuid',
           },
           {

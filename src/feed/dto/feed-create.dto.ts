@@ -19,23 +19,22 @@ export class FeedCreateDto {
   content: string;
 
   @ApiProperty({
-    description: 'URL da imagem principal',
-    example: 'https://example.com/image.jpg',
+    description: 'URL da imagem principal ou Base64',
+    example: 'https://example.com/image.jpg ou data:image/png;base64,...',
     required: false,
   })
   @IsOptional()
   @IsString()
-  @IsUrl()
   imageUrl?: string;
 
   @ApiProperty({
-    description: 'Array de URLs de imagens',
-    example: ['https://example.com/img1.jpg', 'https://example.com/img2.jpg'],
+    description: 'Array de URLs de imagens ou Base64',
+    example: ['https://example.com/img1.jpg', 'data:image/png;base64,...'],
     required: false,
     type: [String],
   })
   @IsOptional()
   @IsArray()
-  @IsUrl({}, { each: true })
+  @IsString({ each: true })
   images?: string[];
 }

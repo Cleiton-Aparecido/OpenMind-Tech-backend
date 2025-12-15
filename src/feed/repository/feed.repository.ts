@@ -37,18 +37,20 @@ export class FeedRepository implements IFeedRepository {
       .createQueryBuilder('feed')
       .leftJoinAndSelect('feed.user', 'user')
       .leftJoin('feed.likes', 'likes')
-      .leftJoin('feed.likes', 'userLike', 'userLike.userId = :userId', { userId })
+      .leftJoin('feed_likes', 'userLike', 'userLike.feedId = feed.id AND userLike.userId = :userId', { userId })
       .select([
         'feed.id',
         'feed.title',
         'feed.content',
+        'feed.imageUrl',
+        'feed.images',
         'feed.createdAt',
         'feed.userId',
         'user.id',
         'user.name',
       ])
-      .addSelect('COUNT(DISTINCT likes.id)', 'likesCount')
-      .addSelect('MAX(CASE WHEN userLike.id IS NOT NULL THEN 1 ELSE 0 END)', 'hasLiked')
+      .addSelect('COALESCE(COUNT(DISTINCT likes.id), 0)', 'likesCount')
+      .addSelect('COALESCE(MAX(CASE WHEN userLike.id IS NOT NULL THEN 1 ELSE 0 END), 0)', 'hasLiked')
       .groupBy('feed.id')
       .addGroupBy('user.id')
       .orderBy('feed.createdAt', 'DESC')
@@ -63,15 +65,18 @@ export class FeedRepository implements IFeedRepository {
 
     const data = result.entities.map((f, index) => {
       const raw = result.raw[index];
+      const likesCount = parseInt(raw.likesCount) || 0;
       return {
         id: f.id,
         title: f.title,
         content: f.content,
+        imageUrl: f.imageUrl,
+        images: f.images,
         createdAt: f.createdAt,
         userId: f.userId,
         userName: f.user?.name,
         edit: f.userId === userId,
-        likesCount: parseInt(raw.likesCount) || 0,
+        ...(likesCount > 0 && { likesCount }),
         hasLiked: parseInt(raw.hasLiked) === 1,
       };
     });

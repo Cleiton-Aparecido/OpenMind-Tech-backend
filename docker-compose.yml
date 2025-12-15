@@ -10,6 +10,8 @@ services:
       POSTGRES_DB: ${DB_DATABASE}
     ports:
       - '5968:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   app:
     build:
